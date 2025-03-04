@@ -91,7 +91,7 @@ export const Movie=()=>{
     },[])
     useEffect(()=>{
         handleFetchURL()
-    },[imgBaseURL])
+    },[])
     return(
         <div>
             <div className="container mx-auto">
