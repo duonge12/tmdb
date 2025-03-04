@@ -1,49 +1,28 @@
 
 import { useState } from "react";
-import { configApi } from "../../services/configApi";
 import { useEffect } from "react";
-import { genresApi } from "../../services/genresApi";
-import { discoverApi } from "../../services/discoverApi";
 import { twMerge } from "tailwind-merge";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
+import { fetchTmdbDiscover, resetDiscover } from "../../redux/tmdbDiscoverReducer";
+import { fetchTmdbGenres } from "../../redux/tmdbGenresReducer";
 
 export const Movie=()=>{
-    const [movies, setMovies]=useState();
-    const [currentPage, setCurrentPage]=useState()
+    const dispatch = useDispatch();
+    const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
+    const { tmdbDiscover} = useSelector((state) => state.tmdbDiscover);
+    const { tmdbGenres} = useSelector((state) => state.tmdbGenres);
     const [selectedGenres, setSelectedGenres]=useState([])
-    const [imgBaseURL, setImgBaseURL]=useState();
-    const [movieGenres, setMovieGenres]=useState();
-    const handleFetchMovie=async(params, refreshData)=>{
-        const response=await discoverApi.getMovie(params);
-        if(response){
-            if(!refreshData){
-                const result=[...movies,...response.results];
-                setMovies(result)
-            }else{
-                setCurrentPage(1)
-                setMovies(response.results)
-            }
-        }
-    } 
-    const handleFetchURL=async()=>{
-        const configResponse=await configApi.getImageConfig();
-        if(configResponse){
-            const {base_url}=configResponse;
-            setImgBaseURL(base_url)
-        }
-    } 
-    const handleFetchMovieGenres=async()=>{
-        const response=await genresApi.getMovieGenres();
-        if(response){
-           setMovieGenres(response.genres)
-        }
-    } 
+    const discoverList=tmdbDiscover.reduce((accumulator, currentValue) => {
+        return accumulator.concat(currentValue.results)
+      }, []);
     const handleFetchMoreMovie=()=>{
-        setCurrentPage(currentPage+1);
-        handleFetchMovie({
-            page:currentPage+1, 
+        const currentPage=tmdbDiscover[tmdbDiscover.length-1].page;
+        dispatch(fetchTmdbDiscover({
+            page:currentPage+1,
             with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
-        },false)
-    }
+        }))
+    } 
     const handleSelectGenre=(movieGenreId)=>{
         const movieGenre=selectedGenres.filter(selectedGenre=> selectedGenre===movieGenreId)[0]
         if(movieGenre){
@@ -55,18 +34,15 @@ export const Movie=()=>{
         }
     }
     const handleSearch=()=>{
-        handleFetchMovie({
-            page:1, 
-            with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
-        },true)
+        dispatch(resetDiscover())
     }
-    const movieCard=movies?.map(movie=>{
+    const movieCard=discoverList?.map(movie=>{
         const date = new Date(movie.release_date);
         const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         const vote_average=Math.round(movie.vote_average*10)
         return(
             <div className="rounded-md shadow-sm overflow-hidden" key={movie.id}>
-                <img className="object-cover w-full h-[150px]" src={`${imgBaseURL}/w220_and_h330_face/${movie.backdrop_path}`} alt="Not found" />
+                <img className="object-cover w-full h-[150px]" src={`${tmdbConfig.images.base_url}/w220_and_h330_face/${movie.backdrop_path}`} alt="Not found" />
                 <div className="h-[100px] flex flex-col justify-center relative pl-2">
                     <div className="absolute p-1 w-[35px] h-[35px] flex items-center justify-center rounded-full bg-black text-white text-sm font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{vote_average}</div>
                     <h2 className="font-bold">{movie.title}</h2>
@@ -75,7 +51,9 @@ export const Movie=()=>{
             </div>
         )
     })
-    const genresButton=movieGenres?.map(movieGenre=>{
+
+    const genresButton= tmdbGenres?.map(movieGenre=>{
+
         const isSelected=selectedGenres.filter(selectedGenre=> selectedGenre === movieGenre.id)[0] ?? false;
         return(
             <button 
@@ -86,12 +64,21 @@ export const Movie=()=>{
         )
     })
     useEffect(()=>{
-        handleFetchMovie({},true);
-        handleFetchMovieGenres();
+        dispatch(fetchTmdbConfig())
     },[])
     useEffect(()=>{
-        handleFetchURL()
-    },[])
+        if(tmdbDiscover.length===0){
+            dispatch(fetchTmdbDiscover({
+                page:1,
+                with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
+            }))
+        }
+        if(tmdbGenres.length===0){
+            dispatch(fetchTmdbGenres())
+
+        }
+    },[tmdbDiscover,tmdbGenres])
+    
     return(
         <div>
             <div className="container mx-auto">
@@ -99,6 +86,7 @@ export const Movie=()=>{
                 <div className="flex">
                     <div className="w-[300px] rounded-lg shadow-md">
                         <div>{genresButton}</div>
+                        
                         <button 
                             className="w-full bg-[#01b4e4] text-white rounded-md mt-2 font-bold text-[20px]"
                             onClick={()=>handleSearch()}
