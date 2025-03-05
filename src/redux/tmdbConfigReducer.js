@@ -7,7 +7,7 @@ export const fetchTmdbConfig = createAsyncThunk('tmdbConfig/fetchTmdbConfig',asy
     return response.data;
 })
 const initialState={
-    tmdbConfig:{},
+    tmdbConfig:undefined,
     loading_tmdbConfig:false,
     tmdbConfig_error:''
 };

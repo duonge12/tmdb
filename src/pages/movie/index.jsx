@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 import { fetchTmdbDiscover, resetDiscover } from "../../redux/tmdbDiscoverReducer";
 import { fetchTmdbGenres } from "../../redux/tmdbGenresReducer";
+import { Link } from "react-router";
 
 export const Movie=()=>{
     const dispatch = useDispatch();
@@ -39,34 +40,38 @@ export const Movie=()=>{
     const movieCard=discoverList?.map(movie=>{
         const date = new Date(movie.release_date);
         const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-        const vote_average=Math.round(movie.vote_average*10)
+        const vote_average=Math.round(movie.vote_average*10);
+        const title=movie.title;
+        const movieID=movie.id;
+        const postalPath=tmdbConfig.images.base_url+tmdbConfig.images.poster_sizes[2]+movie.poster_path;
         return(
-            <div className="rounded-md shadow-sm overflow-hidden" key={movie.id}>
-                <img className="object-cover w-full h-[150px]" src={`${tmdbConfig.images.base_url}/w220_and_h330_face/${movie.backdrop_path}`} alt="Not found" />
+            <Link to={"/movie/"+movieID} className="rounded-md shadow-sm overflow-hidden" key={movieID}>
+                <img className="object-cover w-full h-[242px]" src={postalPath} alt="Not found" />
                 <div className="h-[100px] flex flex-col justify-center relative pl-2">
                     <div className="absolute p-1 w-[35px] h-[35px] flex items-center justify-center rounded-full bg-black text-white text-sm font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{vote_average}</div>
-                    <h2 className="font-bold">{movie.title}</h2>
+                    <h2 className="font-bold">{title}</h2>
                     <h3>{formattedDate}</h3>
                 </div>
-            </div>
+            </Link>
         )
     })
 
     const genresButton= tmdbGenres?.map(movieGenre=>{
-
         const isSelected=selectedGenres.filter(selectedGenre=> selectedGenre === movieGenre.id)[0] ?? false;
+        const genreName=movieGenre.name;
+        const genreId=movieGenre.id
         return(
             <button 
-                key={movieGenre.id} 
+                key={genreId} 
                 className={twMerge("px-4 py-1 border rounded-3xl ml-2 mb-1 text-[15px]",isSelected ? "border-blue-400 text-white bg-blue-400": "hover:border-blue-400 hover:bg-blue-400 hover:text-white")}
-                onClick={()=>handleSelectGenre(movieGenre.id)}
-            >{movieGenre.name}</button>
+                onClick={()=>handleSelectGenre(genreId)}
+            >{genreName}</button>
         )
     })
     useEffect(()=>{
-        dispatch(fetchTmdbConfig())
-    },[])
-    useEffect(()=>{
+        if(!tmdbConfig){
+            dispatch(fetchTmdbConfig())
+        }
         if(tmdbDiscover.length===0){
             dispatch(fetchTmdbDiscover({
                 page:1,
@@ -77,7 +82,7 @@ export const Movie=()=>{
             dispatch(fetchTmdbGenres())
 
         }
-    },[tmdbDiscover,tmdbGenres])
+    },[tmdbDiscover,tmdbGenres,tmdbConfig])
     
     return(
         <div>
