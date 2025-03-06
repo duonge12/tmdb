@@ -43,7 +43,7 @@ export const Movie=()=>{
         const vote_average=Math.round(movie.vote_average*10);
         const title=movie.title;
         const movieID=movie.id;
-        const postalPath=tmdbConfig.images.base_url+tmdbConfig.images.poster_sizes[2]+movie.poster_path;
+        const postalPath=tmdbConfig?.images.base_url+tmdbConfig?.images.poster_sizes[2]+movie.poster_path;
         return(
             <Link to={"/movie/"+movieID} className="rounded-md shadow-sm overflow-hidden" key={movieID}>
                 <img className="object-cover w-full h-[242px]" src={postalPath} alt="Not found" />
@@ -72,17 +72,20 @@ export const Movie=()=>{
         if(!tmdbConfig){
             dispatch(fetchTmdbConfig())
         }
-        if(tmdbDiscover.length===0){
+    },[tmdbConfig])
+    useEffect(()=>{
+        if(!tmdbDiscover[0]){
             dispatch(fetchTmdbDiscover({
                 page:1,
                 with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
             }))
         }
-        if(tmdbGenres.length===0){
+    },[tmdbDiscover])
+    useEffect(()=>{
+        if(tmdbGenres.length=== 0){
             dispatch(fetchTmdbGenres())
-
         }
-    },[tmdbDiscover,tmdbGenres,tmdbConfig])
+    },[tmdbGenres])
     
     return(
         <div>

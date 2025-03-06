@@ -16,18 +16,17 @@ export const DetailMovie=()=>{
     const handleFetchMovie=async()=>{
         const response=await MovieDetailApi.getMovieGenres(movieId)
         if(response){
-            console.log(response)
             setMovieDetail(response)
         }
     }
     const handleAddToFavorite=async()=>{
-        const {id: movieID }=tmdbAccount;
+        const {id: movieID }=tmdbAccount ?? {};
         const body={
             "media_type": "movie",
             "media_id": movieId, 
             "favorite": true
         }
-        const response=await accountApi.addToFavorite(movieID,body)
+        const response=await accountApi.postToFavorite(movieID,body)
         if(!response.success){
             alert('fail to add to favorite')
         }

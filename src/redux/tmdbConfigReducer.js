@@ -23,7 +23,6 @@ const tmdbConfigSlice=createSlice({
             state.tmdbConfig_error = null;
             })
             .addCase(fetchTmdbConfig.fulfilled, (state, action) => {
-            console.log(action.payload)
             state.loading_tmdbConfig = false;
             state.tmdbConfig = action.payload;
             })
