@@ -6,6 +6,7 @@ import { MovieDetailApi } from "../../services/movieDetailApi";
 import { Heart } from "lucide-react";
 import { fetchAccountInfo } from "../../redux/tmdbAccountReducer";
 import { accountApi } from "../../services/accountApi";
+import { fetchFavoriteListInfo } from "../../redux/tmdbAccountFavoriteMovie";
 
 export const DetailMovie=()=>{
     const {movieId}= useParams();
@@ -27,8 +28,10 @@ export const DetailMovie=()=>{
             "favorite": true
         }
         const response=await accountApi.postToFavorite(movieID,body)
-        if(!response.success){
-            alert('fail to add to favorite')
+        if(response.success){
+            const {id: accountId}=tmdbAccount
+            dispatch(
+                fetchFavoriteListInfo(accountId,{ page:1, with_genres:'' }))
         }
     }
     useEffect(()=>{

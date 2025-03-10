@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 import { fetchAccountInfo } from "../../redux/tmdbAccountReducer";
-import { fetchFavoriteListInfo, resetFavoriteList } from "../../redux/tmdbAccountFavoriteMovie";
+import { fetchFavoriteListInfo, removeFromFavoriteList } from "../../redux/tmdbAccountFavoriteMovie";
 import { X } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { accountApi } from "../../services/accountApi";
+
+
+
+
+
 
 export const AccountDetail=()=>{
     const dispatch = useDispatch();
@@ -18,36 +23,37 @@ export const AccountDetail=()=>{
     const avatarSize=tmdbConfig?.images.profile_sizes[1];
     const accountName=tmdbAccount?.username;
     const accountId=tmdbAccount?.id
-    const favoriteList=tmdbFavoriteList.reduce((accumulator, currentValue) => {
-        return accumulator.concat(currentValue.results)
-      }, []);
-    const favoriteRows=favoriteList.map((favoriteItem,favoriteIndex)=>{
+
+    const handleRemoveFromFavorite=async(favoriteID)=>{
+        const {id: accountId }=tmdbAccount ?? {};
+        const body={
+            "media_type": "movie",
+            "media_id": favoriteID, 
+            "favorite": false
+        }
+        const response=await accountApi.postToFavorite(accountId,body)
+        console.log(response)
+        if(response.success){
+            dispatch(removeFromFavoriteList(favoriteID))
+        }
+    }
+
+    const favoriteRows=tmdbFavoriteList.map((favoriteItem,favoriteIndex)=>{
         const title=favoriteItem.title
         const posterPath=favoriteItem.poster_path;
         const posterSize=tmdbConfig?.images.poster_sizes[1];
         const vote_average=Math.round(favoriteItem.vote_average*10);
         const overview=favoriteItem.overview;
-        const favoriteID=favoriteItem.id
-        const handleRemoveFromFavorite=async()=>{
-                const {id: movieID }=tmdbAccount ?? {};
-                const body={
-                    "media_type": "movie",
-                    "media_id": favoriteID, 
-                    "favorite": false
-                }
-                const response=await accountApi.postToFavorite(movieID,body)
-                if(response.success){
-                    dispatch(resetFavoriteList())
-                }
-        }
+        const favoriteID=favoriteItem.id;
         const ButtonRemove=()=>{
             const [isHover, setIsHover]=useState(false)
+           
             return(
                 <button 
                     className="flex gap-2 text-pink-500 items-center" 
                     onMouseOver={()=>setIsHover(true)} 
                     onMouseLeave={()=>setIsHover(false)}
-                    onClick={handleRemoveFromFavorite}
+                    onClick={()=>handleRemoveFromFavorite(favoriteID)}
                 >
                     <X className={twMerge("bg-white border border-pink-500 p-1 rounded-full", isHover && "bg-pink-500 text-white")}/> 
                     <span>Remove</span>
@@ -82,7 +88,10 @@ export const AccountDetail=()=>{
     },[tmdbAccount]);
     useEffect(()=>{
         if(!tmdbFavoriteList[0]){
-            dispatch(fetchFavoriteListInfo(accountId,{}))
+            dispatch(fetchFavoriteListInfo(accountId,{
+                page:1,
+                with_genres:''
+            }))
         }
     },[tmdbFavoriteList]);
     return(

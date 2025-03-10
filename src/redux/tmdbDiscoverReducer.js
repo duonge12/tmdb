@@ -7,7 +7,9 @@ export const fetchTmdbDiscover = createAsyncThunk('tmdbDiscover/fetchTmdbDiscove
     return response.data;
 })
 const initialState={
-    tmdbDiscover:[],
+    tmdbDiscover: [],
+    currentPage: 1,
+    totalPages: 1,
     loading_tmdbDiscover:false,
     tmdbDiscover_error:''
 };
@@ -16,11 +18,6 @@ const tmdbDiscoverSlice=createSlice({
     name:"tmdbDiscover",
     initialState:initialState,
     reducers:{
-        resetDiscover: (state) => {
-            state.tmdbDiscover = []
-            state.loading_tmdbDiscover=false
-            state.tmdbDiscover_error = "";
-        },
     },
     extraReducers: (builder) => {
         builder
@@ -29,12 +26,16 @@ const tmdbDiscoverSlice=createSlice({
                 state.tmdbDiscover_error = null;
             })
             .addCase(fetchTmdbDiscover.fulfilled, (state, action) => {
-                const currentPage=state.tmdbDiscover[state.tmdbDiscover.length-1]?.page;
-                if(currentPage && (currentPage === action.payload.page)) return;
-                state.loading_tmdbDiscover = false;
-                const newDiscoverList=[...state.tmdbDiscover]
-                newDiscoverList.push(action.payload);
-                state.tmdbDiscover = newDiscoverList
+                const { results, page, total_pages } = action.payload;
+                if (page === 1) {
+                    state.tmdbDiscover = [...results];
+                }
+                if ((page !== state.currentPage) && (page !==1)) {
+                  state.tmdbDiscover = [...state.tmdbDiscover, ...results];
+                }
+                state.currentPage = page;
+                state.totalPages = total_pages;
+                state.loading = false;
             })
             .addCase(fetchTmdbDiscover.rejected, (state, action) => {
                 state.loading_tmdbDiscover = false;

@@ -11,16 +11,13 @@ import { Link } from "react-router";
 export const Movie=()=>{
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
-    const { tmdbDiscover} = useSelector((state) => state.tmdbDiscover);
+    const { tmdbDiscover, currentPage} = useSelector((state) => state.tmdbDiscover);
     const { tmdbGenres} = useSelector((state) => state.tmdbGenres);
     const [selectedGenres, setSelectedGenres]=useState([])
-    const discoverList=tmdbDiscover.reduce((accumulator, currentValue) => {
-        return accumulator.concat(currentValue.results)
-      }, []);
     const handleFetchMoreMovie=()=>{
-        const currentPage=tmdbDiscover[tmdbDiscover.length-1].page;
+        const nextPage=currentPage+1;
         dispatch(fetchTmdbDiscover({
-            page:currentPage+1,
+            page:nextPage,
             with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
         }))
     } 
@@ -35,9 +32,12 @@ export const Movie=()=>{
         }
     }
     const handleSearch=()=>{
-        dispatch(resetDiscover())
+        dispatch(fetchTmdbDiscover({
+            page:1,
+            with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
+        }))
     }
-    const movieCard=discoverList?.map(movie=>{
+    const movieCard=tmdbDiscover?.map(movie=>{
         const date = new Date(movie.release_date);
         const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         const vote_average=Math.round(movie.vote_average*10);
