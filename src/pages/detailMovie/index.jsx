@@ -2,11 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router"
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 import { useEffect, useState } from "react";
-import { MovieDetailApi } from "../../services/movieDetailApi";
 import { Heart } from "lucide-react";
 import { fetchAccountInfo } from "../../redux/tmdbAccountReducer";
 import { accountApi } from "../../services/accountApi";
 import { fetchFavoriteListInfo } from "../../redux/tmdbAccountFavoriteMovie";
+import { movieApi } from "../../services/movieApi";
 
 export const DetailMovie=()=>{
     const {movieId}= useParams();
@@ -15,7 +15,7 @@ export const DetailMovie=()=>{
     const { tmdbAccount, loading_tmdbAccount} = useSelector((state) => state.tmdbAccount);
     const [ movieDetail, setMovieDetail]=useState(undefined);
     const handleFetchMovie=async()=>{
-        const response=await MovieDetailApi.getMovieGenres(movieId)
+        const response=await movieApi.getMovieGenres(movieId)
         if(response){
             setMovieDetail(response)
         }

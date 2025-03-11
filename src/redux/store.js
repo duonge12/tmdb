@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { tmdbConfigReducer } from "./tmdbConfigReducer";
-import { tmdbDiscoverReducer } from "./tmdbDiscoverReducer";
 import { tmdbGenresReducer } from "./tmdbGenresReducer";
 import { tmdbAccountReducer } from "./tmdbAccountReducer";
 import { tmdbFavoriteListReducer } from "./tmdbAccountFavoriteMovie";
+import { tmdbTrendingMovieReducer } from "./tmdbTrendingMovie";
+import { tmdbDiscoverReducer } from "./tmdbDiscoverReducer";
+import { tmdbPopularReducer } from "./tmdbPopularReducer";
 
 export const store=configureStore({
     reducer:{
@@ -11,7 +13,10 @@ export const store=configureStore({
         tmdbDiscover:tmdbDiscoverReducer,
         tmdbGenres:tmdbGenresReducer,
         tmdbAccount:tmdbAccountReducer,
-        tmdbFavoriteList:tmdbFavoriteListReducer
+        tmdbFavoriteList:tmdbFavoriteListReducer,
+        tmdbTrendingMovie:tmdbTrendingMovieReducer,
+        tmdbPopularMovie:tmdbPopularReducer
+     
     }
 })
  
