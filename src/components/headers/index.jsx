@@ -24,6 +24,10 @@ const menuItems=[
             {
                 title:"Top rated",
                 to:"/movie/top-rated"
+            },
+            {
+                title:"Testing",
+                to:"/test"
             }
         ]
     },
@@ -36,11 +40,11 @@ const menuItems=[
             },
             {
                 title:"Airing Today",
-                to:"/tv/airing-today"
+                to:"/tv/now-playing"
             },
             {
                 title:"On TV",
-                to:"/tv/on-the-air"
+                to:"/tv/upcoming"
             },
             {
                 title:"Top rated",
@@ -113,7 +117,7 @@ export const Header=()=>{
             >
                 <span className="select-none">{category}</span>
                 { (visible === category) && 
-                    <ul className="absolute bg-white text-black pl-4 pr-12 whitespace-nowrap rounded-md">
+                    <ul className="absolute z-20 bg-white text-black pl-4 pr-12 whitespace-nowrap rounded-md">
                         {subCategories.map((item, index)=>{
                             const subCategory=item.title;
                             const routerPath=item.to;
@@ -168,7 +172,7 @@ export const Header=()=>{
                     <img src={accountAvatar} alt="none" className="rounded-full object-cover w-[30px] h-[30px]" onClick={()=>handleToggleMenu(accountAvatar)}/>
                     {
                         visible === accountAvatar && 
-                        <div className="absolute bg-white rounded-md flex flex-col">
+                        <div className="absolute z-20 bg-white rounded-md flex flex-col">
                             {accountMenuHeader}
                             <ul>
                                 {accountDropDown}

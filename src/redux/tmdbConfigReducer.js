@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { configApi } from "../services/configApi";
+import { configurationApi } from "../services/configurationApi";
 
 
 export const fetchTmdbConfig = createAsyncThunk('tmdbConfig/fetchTmdbConfig',async()=>{
-    const response=await configApi.getImageConfig();
+    const response=await configurationApi.getImageConfig();
     return response.data;
 })
 const initialState={

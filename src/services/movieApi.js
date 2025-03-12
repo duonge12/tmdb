@@ -1,7 +1,7 @@
 import { instance } from "./axios";
 
 export const movieApi={
-    getMovieGenres:async(movie_id)=>{
+    getMovieDetail:async(movie_id)=>{
         try{
             const response= await instance.get(`/movie/${movie_id}`);
             if(response){

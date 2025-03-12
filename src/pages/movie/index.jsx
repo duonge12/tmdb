@@ -1,43 +1,61 @@
-
-import { useState } from "react";
 import { useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
-import { fetchTmdbDiscover, resetDiscover } from "../../redux/tmdbDiscoverReducer";
 import { fetchTmdbGenres } from "../../redux/tmdbGenresReducer";
-import { Link } from "react-router";
+import { Link, useLocation, useParams, useSearchParams } from "react-router";
+import { useDiscoverApi } from "../../hooks/useDiscoverApi";
+
 
 export const Movie=()=>{
+    const [searchParams, setSearchParams] = useSearchParams();
+    const {pathname} = useLocation();
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
-    const { tmdbDiscover, currentPage} = useSelector((state) => state.tmdbDiscover);
     const { tmdbGenres} = useSelector((state) => state.tmdbGenres);
-    const [selectedGenres, setSelectedGenres]=useState([])
+    const {movies, page, fetchMovie, sort_by} =useDiscoverApi(pathname);
+
     const handleFetchMoreMovie=()=>{
-        const nextPage=currentPage+1;
-        dispatch(fetchTmdbDiscover({
+        const nextPage=page+1;
+        dispatch(fetchMovie({
             page:nextPage,
-            with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
+            with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
+            sort_by:sort_by
         }))
     } 
-    const handleSelectGenre=(movieGenreId)=>{
-        const movieGenre=selectedGenres.filter(selectedGenre=> selectedGenre===movieGenreId)[0]
-        if(movieGenre){
-            const selectedGenresFiltered=selectedGenres.filter(selectedGenre=> selectedGenre !== movieGenreId)
-            setSelectedGenres(selectedGenresFiltered)
-        }else{
-            selectedGenres.push(movieGenreId);
-            setSelectedGenres([...selectedGenres])
+    const updateURLParams = (updatedGenres) => {
+        const params={...searchParams}
+        if (updatedGenres.length) {
+            setSearchParams({...params,genreId: updatedGenres.join(",") });
+        } else {
+            setSearchParams({...params});
         }
+    };
+    const handleSelectGenre=(movieGenreId)=>{
+        const genreId=movieGenreId.toString()
+        
+        const selectedGenres=searchParams.get('genreId')?.split(',') ?? []
+        let updatedGenres=[]
+        if(selectedGenres.length ===0){
+            updatedGenres= [...selectedGenres, genreId]
+        }
+        else if(selectedGenres.includes(genreId)){
+            updatedGenres=selectedGenres.filter((id) => id !== genreId)
+        }
+        else{
+            updatedGenres=[...selectedGenres, genreId];
+        }
+        updateURLParams(updatedGenres);
     }
     const handleSearch=()=>{
-        dispatch(fetchTmdbDiscover({
+        dispatch(fetchMovie({
             page:1,
-            with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
+            with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
+            sort_by:sort_by
         }))
     }
-    const movieCard=tmdbDiscover?.map(movie=>{
+
+    const movieCard=movies?.map(movie=>{
         const date = new Date(movie.release_date);
         const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         const vote_average=Math.round(movie.vote_average*10);
@@ -55,11 +73,12 @@ export const Movie=()=>{
             </Link>
         )
     })
-
+    
     const genresButton= tmdbGenres?.map(movieGenre=>{
-        const isSelected=selectedGenres.filter(selectedGenre=> selectedGenre === movieGenre.id)[0] ?? false;
+        const selectedId=searchParams.get('genreId')?.split(',') ?? [];
+        const isSelected=selectedId.filter(selectedGenre=> selectedGenre === movieGenre.id.toString())[0] ?? false;
         const genreName=movieGenre.name;
-        const genreId=movieGenre.id
+        const genreId=movieGenre.id;
         return(
             <button 
                 key={genreId} 
@@ -68,24 +87,33 @@ export const Movie=()=>{
             >{genreName}</button>
         )
     })
+
     useEffect(()=>{
         if(!tmdbConfig){
             dispatch(fetchTmdbConfig())
         }
     },[tmdbConfig])
     useEffect(()=>{
-        if(!tmdbDiscover[0]){
-            dispatch(fetchTmdbDiscover({
+        if(movies.length ===0){
+            dispatch(fetchMovie({
                 page:1,
-                with_genres:selectedGenres.length !==0 ? selectedGenres.join(",") : ''
+                with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
+                sort_by:sort_by
             }))
         }
-    },[tmdbDiscover])
+    },[movies.length])
     useEffect(()=>{
         if(tmdbGenres.length=== 0){
             dispatch(fetchTmdbGenres())
         }
     },[tmdbGenres])
+    useEffect(()=>{
+        dispatch(fetchMovie({
+            page:1,
+            with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
+            sort_by:sort_by
+        }))
+    },[sort_by])
     
     return(
         <div>

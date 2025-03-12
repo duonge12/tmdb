@@ -19,18 +19,8 @@ const tmdbFavoriteListSlice=createSlice({
     reducers:{
         removeFromFavoriteList:(state,action)=>{
             const movieId=action.payload
-            const pageIndex= state.tmdbFavoriteList.findIndex(page=> {
-                const pageMatched= page.results.filter(movie=> movie.id===movieId)
-                if(pageMatched.length >0) return true;
-            })
-            if(pageIndex !==-1){
-                const matchedPage=state.tmdbFavoriteList[pageIndex];
-                const currentState=state.tmdbFavoriteList
-                const filteredResult= matchedPage.results.filter(movie=> movie.id !== movieId);
-                currentState[pageIndex].results=filteredResult;
-                state.tmdbFavoriteList=currentState;
-            }
-            
+            const newList =state.tmdbFavoriteList.filter(movie=> movie.id !== movieId)
+            state.tmdbFavoriteList=newList
         }
     },
     extraReducers: (builder) => {
@@ -47,6 +37,7 @@ const tmdbFavoriteListSlice=createSlice({
                 if ((page !== state.currentPage) && (page !==1)) {
                   state.tmdbFavoriteList = [...state.tmdbFavoriteList, ...results];
                 }
+                console.log('favorite',state.tmdbFavoriteList )
                 state.currentPage = page;
                 state.totalPages = total_pages;
                 state.loading_tmdbFavoriteList = false;
@@ -58,5 +49,5 @@ const tmdbFavoriteListSlice=createSlice({
     },
 })
 const tmdbFavoriteListReducer=tmdbFavoriteListSlice.reducer
-const {resetFavoriteList,removeFromFavoriteList}=tmdbFavoriteListSlice.actions
-export {tmdbFavoriteListReducer, resetFavoriteList,removeFromFavoriteList}
+const {removeFromFavoriteList}=tmdbFavoriteListSlice.actions
+export {tmdbFavoriteListReducer,removeFromFavoriteList}

@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { movieListApi } from "../services/movieListApi";
+import { movieListsApi } from "../services/movieListsApi";
 
 
 export const fetchTmdbPopularMovie = createAsyncThunk('tmdbPopularMovie/fetchTmdbPopularMovie',async(params)=>{
-    const response=await movieListApi.getPopularMovie(params);
+    const response=await movieListsApi.getPopularMovie(params);
     return response.data;
 })
 const initialState={

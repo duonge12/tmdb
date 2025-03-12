@@ -15,7 +15,7 @@ export const DetailMovie=()=>{
     const { tmdbAccount, loading_tmdbAccount} = useSelector((state) => state.tmdbAccount);
     const [ movieDetail, setMovieDetail]=useState(undefined);
     const handleFetchMovie=async()=>{
-        const response=await movieApi.getMovieGenres(movieId)
+        const response=await movieApi.getMovieDetail(movieId)
         if(response){
             setMovieDetail(response)
         }

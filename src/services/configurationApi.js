@@ -1,6 +1,6 @@
 import { instance } from "./axios";
 
-export const configApi={
+export const configurationApi={
     getImageConfig:async()=>{
         return instance.get("/configuration");
     }

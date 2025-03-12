@@ -1,5 +1,6 @@
+import { instanceAccount } from "./axios";
 
-import { instanceAccount } from "./axiosAccount";
+
 
 export const accountApi={
     getAccountInfo:async()=>{

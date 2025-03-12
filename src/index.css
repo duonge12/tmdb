@@ -2,3 +2,7 @@
 .container{
     width: 1200px;
 }
+#test{
+    white-space: pre-wrap; /* Wraps text */
+    word-wrap: break-word; /* Breaks long words */
+}

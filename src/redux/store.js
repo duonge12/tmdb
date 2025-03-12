@@ -6,6 +6,7 @@ import { tmdbFavoriteListReducer } from "./tmdbAccountFavoriteMovie";
 import { tmdbTrendingMovieReducer } from "./tmdbTrendingMovie";
 import { tmdbDiscoverReducer } from "./tmdbDiscoverReducer";
 import { tmdbPopularReducer } from "./tmdbPopularReducer";
+import { tmdbTVReducer } from "./tmdbTvReducer";
 
 export const store=configureStore({
     reducer:{
@@ -15,7 +16,8 @@ export const store=configureStore({
         tmdbAccount:tmdbAccountReducer,
         tmdbFavoriteList:tmdbFavoriteListReducer,
         tmdbTrendingMovie:tmdbTrendingMovieReducer,
-        tmdbPopularMovie:tmdbPopularReducer
+        tmdbPopularMovie:tmdbPopularReducer,
+        tmdbTV:tmdbTVReducer,
      
     }
 })

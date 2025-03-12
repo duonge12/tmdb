@@ -1,6 +1,6 @@
 import { instance } from "./axios";
 
-export const movieListApi={
+export const movieListsApi={
     getPopularMovie:async(params)=>{
         return instance.get("/movie/popular",{ params:params});
     },

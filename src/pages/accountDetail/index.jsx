@@ -32,7 +32,6 @@ export const AccountDetail=()=>{
             "favorite": false
         }
         const response=await accountApi.postToFavorite(accountId,body)
-        console.log(response)
         if(response.success){
             dispatch(removeFromFavoriteList(favoriteID))
         }
@@ -93,7 +92,7 @@ export const AccountDetail=()=>{
                 with_genres:''
             }))
         }
-    },[tmdbFavoriteList]);
+    },[tmdbFavoriteList.length]);
     return(
         <div className="w-full">
             <div className="container mx-auto">
