@@ -1,6 +1,6 @@
 import { instance } from "./axios";
 
-export const movieApi={
+export const moviesApi={
     getMovieDetail:async(movie_id)=>{
         try{
             const response= await instance.get(`/movie/${movie_id}`);
@@ -11,14 +11,4 @@ export const movieApi={
             throw error;
         }
     },
-    getMovieVideo:async(movie_id)=>{
-        try{
-            const response= await instance.get(`/movie/${movie_id}/videos`);
-            if(response){
-                return response.data;
-            }
-        }catch(error){
-            throw error;
-        }
-    }
 }

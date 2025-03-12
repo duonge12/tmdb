@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSwipeable } from "react-swipeable";
-import { fetchTmdbTrendingMovie } from "../../redux/tmdbTrendingMovie";
+import { fetchTmdbTrendingMovie } from "../../redux/tmdbTrendingMovieReducer";
 import { Link } from "react-router";
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 
@@ -23,19 +23,17 @@ export const TrendingBanner=()=>{
         }
     };
     const imgBaseUrl=tmdbConfig?.images.base_url;
-    const imgSize=tmdbConfig?.images.poster_sizes[1]
+    const imgSize=tmdbConfig?.images.poster_sizes
     const slides=tmdbTrendingMovie.map((movie) =>{
-        const date = new Date(movie.release_date);
-        const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-        const vote_average=Math.round(movie.vote_average*10);
-        const title=movie.title;
-        const movieID=movie.id;
-        const postalPath=imgBaseUrl+imgSize+movie.poster_path;
+        const {release_date, vote_average, title, id, poster_path}=movie
+        const formattedDate = new Date(release_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        const formatedVoteAverage=Math.round(vote_average*10);
+        const postalPath=imgBaseUrl+imgSize[1]+poster_path;
         return(
-            <Link to={"/movie/"+movieID} className="rounded-md min-w-[150px] shadow-sm" key={movieID}>
+            <Link to={"/movie/"+id} className="rounded-md min-w-[150px] shadow-sm" key={id}>
                 <img className="object-cover w-full h-[225px]" src={postalPath} alt="Not found" />
                 <div className="h-[100px] flex flex-col justify-center relative pl-2">
-                    <div className="absolute p-1 w-[35px] h-[35px] flex items-center justify-center rounded-full bg-black text-white text-sm font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{vote_average}</div>
+                    <div className="absolute p-1 w-[35px] h-[35px] flex items-center justify-center rounded-full bg-black text-white text-sm font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{formatedVoteAverage}</div>
                     <h2 className="font-bold">{title}</h2>
                     <h3>{formattedDate}</h3>
                 </div>
@@ -43,18 +41,20 @@ export const TrendingBanner=()=>{
         )
     })
     useEffect(()=>{
-        if(!tmdbTrendingMovie[0]){
-            dispatch(fetchTmdbTrendingMovie({
+        if(tmdbTrendingMovie.length ===0){
+            const params={
                 time_window:time,
                 language:'en-US'
-            }))
+            }
+            dispatch(fetchTmdbTrendingMovie(params))
         }
-    },[tmdbTrendingMovie])
+    },[tmdbTrendingMovie.length])
     useEffect(()=>{
-        dispatch(fetchTmdbTrendingMovie({
+        const params={
             time_window:time,
             language:'en-US'
-        }))
+        }
+        dispatch(fetchTmdbTrendingMovie(params))
     },[time])
     useEffect(()=>{
             if(!tmdbConfig){

@@ -4,17 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 import { fetchTmdbGenres } from "../../redux/tmdbGenresReducer";
 import { Link, useLocation, useSearchParams } from "react-router";
-import { fetchTmdbDiscover } from "../../redux/tmdbDiscoverReducer";
 import { handleSortBy } from "../../utils/handleUrl";
+import { fetchTmdbTV } from "../../redux/tmdbTvReducer";
 
 
-export const Movie=()=>{
+export const TV=()=>{
     const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useDispatch();
     const {pathname}=useLocation();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
     const { tmdbGenres} = useSelector((state) => state.tmdbGenres);
-    const { tmdbDiscover, currentPage} = useSelector((state) => state.tmdbDiscover);
+    const { tmdbTV, currentPage} = useSelector((state) => state.tmdbTV);
 
     const imgBaseUrl=tmdbConfig?.images.base_url;
     const imgSizes=tmdbConfig?.images.poster_sizes;
@@ -24,7 +24,7 @@ export const Movie=()=>{
             with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
             sort_by:handleSortBy(pathname)
         }
-        dispatch(fetchTmdbDiscover(params))
+        dispatch(fetchTmdbTV(params))
     } 
     const updateURLParams = (updatedGenres) => {
         const params={...searchParams}
@@ -56,11 +56,11 @@ export const Movie=()=>{
             with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
             sort_by:handleSortBy(pathname)
         }
-        dispatch(fetchTmdbDiscover(params))
+        dispatch(fetchTmdbTV(params))
     }
-    const movieCard=tmdbDiscover?.map(movie=>{
-        const {release_date,vote_average, title, id, poster_path }=movie
-        const formattedDate = new Date(release_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const movieCard=tmdbTV?.map(movie=>{
+        const {first_air_date,vote_average, name, id, poster_path }=movie
+        const formattedDate = new Date(first_air_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         const formattedVoteAverage=Math.round(vote_average*10);
         const postalPath=imgBaseUrl+imgSizes[2]+poster_path;
         return(
@@ -68,7 +68,7 @@ export const Movie=()=>{
                 <img className="object-cover w-full h-[242px]" src={postalPath} alt="Not found" />
                 <div className="h-[100px] flex flex-col justify-center relative pl-2">
                     <div className="absolute p-1 w-[35px] h-[35px] flex items-center justify-center rounded-full bg-black text-white text-sm font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{formattedVoteAverage}</div>
-                    <h2 className="font-bold">{title}</h2>
+                    <h2 className="font-bold">{name}</h2>
                     <h3>{formattedDate}</h3>
                 </div>
             </Link>
@@ -94,22 +94,22 @@ export const Movie=()=>{
         }
     },[tmdbConfig])
     useEffect(()=>{
-        if(tmdbDiscover.length ===0){
+        if(tmdbTV.length ===0){
             const params={
                 page:1,
                 with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
                 sort_by:handleSortBy(pathname)
             }
-            dispatch(fetchTmdbDiscover(params))
+            dispatch(fetchTmdbTV(params))
         }
-    },[tmdbDiscover.length])
+    },[tmdbTV.length])
     useEffect(()=>{
         const params={
             page:1,
             with_genres:searchParams.get('genreId')?.split(',').join(",") ?? '',
             sort_by:handleSortBy(pathname)
         }
-        dispatch(fetchTmdbDiscover(params))
+        dispatch(fetchTmdbTV(params))
     },[pathname])
     useEffect(()=>{
         if(tmdbGenres.length=== 0){

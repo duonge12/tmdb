@@ -105,7 +105,11 @@ export const Header=()=>{
         }
         setVisible(currenVisible)
     }
+    const avatarBaseURL=tmdbConfig?.images.base_url;
+    const avatarSize=tmdbConfig?.images.profile_sizes[0]
+    const accountAvatar=avatarBaseURL+avatarSize+ tmdbAccount?.avatar.tmdb.avatar_path
     const accountName=tmdbAccount?.username ?? '?'
+
     const menuItemUI=menuItems.map((menuItem, menuItemIndex)=>{
         const category=menuItem.title;
         const subCategories=menuItem.child
@@ -134,21 +138,18 @@ export const Header=()=>{
         )
     })
     const accountDropDown=accountMenuItems.map((accountMenuItem, accountMenuItemIndex)=>{
-        const title=accountMenuItem.title;
-        const routerPath=accountMenuItem.to;
+        const {title, to}=accountMenuItem
         return(
             <li key={accountMenuItemIndex} className="py-2 pl-4 pr-12">
-            <Link to={routerPath}>{title}</Link>
+            <Link to={to}>{title}</Link>
             </li>
         )
     })
     const accountMenuHeader=tmdbAccount && 
-    <Link className="py-2 pl-4 pr-12 border-b-[1px]" to={"/account/accountDetail"}>
-        <h1 className="font-bold">{accountName}</h1>
-        <div className="whitespace-nowrap">View Profile</div>
-    </Link>
-    
-    const accountAvatar=tmdbConfig?.images.base_url+tmdbConfig?.images.profile_sizes[0]+ tmdbAccount?.avatar.tmdb.avatar_path
+        <Link className="py-2 pl-4 pr-12 border-b-[1px]" to={"/account/accountDetail"}>
+            <h1 className="font-bold">{accountName}</h1>
+            <div className="whitespace-nowrap">View Profile</div>
+        </Link>
     useEffect(()=>{
         if(!tmdbConfig){
             dispatch(fetchTmdbConfig())

@@ -1,10 +1,6 @@
 import { createBrowserRouter, Outlet } from "react-router";
 import { App } from "../layouts";
-import { Movie } from "../pages/movie";
-import { DetailMovie } from "../pages/detailMovie";
-import { AccountDetail } from "../pages/accountDetail";
-import { Home } from "../pages/home";
-import { Test } from "../pages/test";
+import { AccountDetail, DetailMovie, DetailTV, Home, Movie, People, PeopleDetail, Test, TV } from "../pages";
 
 export const router=createBrowserRouter([
     { path:'/', element:<App/>,
@@ -15,11 +11,14 @@ export const router=createBrowserRouter([
                 { path: ":subCategory", element: <Movie /> },
             ]},
             { path:'/tv', element:<><Outlet/></>, children:[
-                { index: true, element: <Movie /> },
-                { path: ":subCategory", element: <Movie /> },
+                { index: true, element: <TV /> },
+                { path: ":subCategory", element: <TV /> },
             ]},
+            { path:'/person', element:<People/>},
             { path:'/test', element:<Test/>},
-            { path:'/movie/:movieId', element:<DetailMovie/>},
+            { path:'/movie/detail/:movieId', element:<DetailMovie/>},
+            { path:'/tv/detail/:tvId', element:<DetailTV/>},
+            { path:'/person/:personId', element:<PeopleDetail/>},
             { path:'/account/accountDetail', element:<AccountDetail/>},
         ]
     }

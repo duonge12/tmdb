@@ -21,25 +21,26 @@ export const LastestTrailerBanner=()=>{
         }
     };
     const imgBaseUrl=tmdbConfig?.images.base_url;
-    const imgSize=tmdbConfig?.images.poster_sizes[1];
+    const imgSize=tmdbConfig?.images.poster_sizes;
 
     const slides=tmdbPopular?.map((movie) =>{
-        const movieID=movie.id;
-        const postalPath=imgBaseUrl+imgSize+movie.poster_path;
+        const {id, poster_path}=movie;
+        const postalPath=imgBaseUrl+imgSize[1]+poster_path;
         return(
-            <div to={"/movie/"+movieID} className="rounded-md min-w-[150px] shadow-sm" key={movieID}>
+            <div to={"/movie/"+id} className="rounded-md min-w-[150px] shadow-sm" key={id}>
                 <img className="object-cover w-full h-[225px]" src={postalPath} alt="Not found" />
             </div>
         )
     })
     useEffect(()=>{
         if(tmdbPopular.length ===0){
-            dispatch(fetchTmdbPopularMovie({
+            const params={
                 language:'en-US',
                 page:1
-            }))
+            }
+            dispatch(fetchTmdbPopularMovie(params))
         }
-    },[tmdbPopular])
+    },[tmdbPopular.length])
     useEffect(()=>{
         if(!tmdbConfig){
             dispatch(fetchTmdbConfig())

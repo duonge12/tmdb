@@ -2,8 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { trendingApi } from "../services/trendingApi";
 
 
-
-
 export const fetchTmdbTrendingMovie = createAsyncThunk('tmdbTrendingMovie/fetchTmdbTrendingMovie',async(params)=>{
     const response=await trendingApi.getTrendingMovie(params);
     return response.data;

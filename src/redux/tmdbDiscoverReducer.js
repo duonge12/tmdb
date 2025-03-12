@@ -44,5 +44,4 @@ const tmdbDiscoverSlice=createSlice({
     },
 })
 const tmdbDiscoverReducer=tmdbDiscoverSlice.reducer
-const {resetDiscover}=tmdbDiscoverSlice.actions
-export {tmdbDiscoverReducer, resetDiscover}
+export {tmdbDiscoverReducer}

@@ -17,25 +17,24 @@ export const PopularBanner=()=>{
         preventDefaultTouchmoveEvent: true,
         trackMouse: true,
     });
+
     const scrollByAmount = (amount) => {
         if (scrollRef.current) {
           scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
         }
     };
     const imgBaseUrl=tmdbConfig?.images.base_url;
-    const imgSize=tmdbConfig?.images.poster_sizes[1]
+    const imgSize=tmdbConfig?.images.poster_sizes;
     const slides=tmdbPopular?.map((movie) =>{
-        const date = new Date(movie.release_date);
-        const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-        const vote_average=Math.round(movie.vote_average*10);
-        const title=movie.title;
-        const movieID=movie.id;
-        const postalPath=imgBaseUrl+imgSize+movie.poster_path;
+        const {id, title, release_date, vote_average, poster_path}=movie;
+        const formattedDate = new Date(release_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        const formatedVoteAverage=Math.round(vote_average*10);
+        const postalPath=imgBaseUrl+imgSize[1]+poster_path;
         return(
-            <Link to={"/movie/"+movieID} className="rounded-md min-w-[150px] shadow-sm" key={movieID}>
+            <Link to={"/movie/"+id} className="rounded-md min-w-[150px] shadow-sm" key={id}>
                 <img className="object-cover w-full h-[225px]" src={postalPath} alt="Not found" />
                 <div className="h-[100px] flex flex-col justify-center relative pl-2">
-                    <div className="absolute p-1 w-[35px] h-[35px] flex items-center justify-center rounded-full bg-black text-white text-sm font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{vote_average}</div>
+                    <div className="absolute p-1 w-[35px] h-[35px] flex items-center justify-center rounded-full bg-black text-white text-sm font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{formatedVoteAverage}</div>
                     <h2 className="font-bold">{title}</h2>
                     <h3>{formattedDate}</h3>
                 </div>
@@ -44,12 +43,13 @@ export const PopularBanner=()=>{
     })
     useEffect(()=>{
         if(tmdbPopular.length ===0){
-            dispatch(fetchTmdbPopularMovie({
+            const params={
                 language:'en-US',
                 page:1
-            }))
+            }
+            dispatch(fetchTmdbPopularMovie(params))
         }
-    },[tmdbPopular])
+    },[tmdbPopular.length])
     useEffect(()=>{
             if(!tmdbConfig){
                 dispatch(fetchTmdbConfig())
