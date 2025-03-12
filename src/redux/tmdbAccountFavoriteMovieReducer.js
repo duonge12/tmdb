@@ -37,7 +37,6 @@ const tmdbFavoriteListSlice=createSlice({
                 if ((page !== state.currentPage) && (page !==1)) {
                   state.tmdbFavoriteList = [...state.tmdbFavoriteList, ...results];
                 }
-                console.log('favorite',state.tmdbFavoriteList )
                 state.currentPage = page;
                 state.totalPages = total_pages;
                 state.loading_tmdbFavoriteList = false;

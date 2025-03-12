@@ -42,7 +42,6 @@ export const DetailTV=()=>{
         }
     },[tmdbConfig])
     useEffect(()=>{
-        console.log(tvDetail)
         if(!tvDetail){
             handleFetchTV()
         }

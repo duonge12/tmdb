@@ -3,62 +3,108 @@ import { useParams } from "react-router"
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
-import { fetchAccountInfo } from "../../redux/tmdbAccountReducer";
+import { peopleApi } from "../../services/peopleApi";
+import { KnownForBanner } from "./knownForBanner";
+import { Acting } from "./acting";
 
 export const PeopleDetail=()=>{
     const {personId}= useParams();
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
-    const [ personDetail, setPersonDetail]=useState(undefined);
+    const [ personDetail, setPersonDetail]=useState();
+    const [ known_for_movie, setKnown_for_movie]=useState()
+
+    const handleFetchPeople=async()=>{
+        const response=await peopleApi.getPeopleDetail(personId)
+        if(response){
+            setPersonDetail(response)
+        }
+    }
+    const handleFetchKnownForMovie=async()=>{
+        const response=await peopleApi.getCombinedCredit(personId)
+        if(response){
+            setKnown_for_movie(response)
+        }
+    }
+    const imgBaseUrl=tmdbConfig?.images.base_url ?? '';
+    const imgSize=tmdbConfig?.images.profile_sizes[1] ?? '';
+
     useEffect(()=>{
         if(!tmdbConfig){
             dispatch(fetchTmdbConfig())
         }
-        if(!movieDetail){
-            handleFetchMovie()
+    },[tmdbConfig])
+
+    useEffect(()=>{
+        if(!personDetail){
+            handleFetchPeople()
         }
-        if(!tmdbAccount){
-            dispatch(fetchAccountInfo())
+    },[personDetail])
+
+    useEffect(()=>{
+        console.log(known_for_movie)
+        if(!known_for_movie){
+            handleFetchKnownForMovie()
         }
-    },[tmdbConfig,movieDetail,tmdbAccount])
-    
-    if(movieDetail && tmdbConfig){
-        const year=new Date(movieDetail.release_date).getFullYear();
-        const vote_average=Math.round(movieDetail.vote_average*10);
-        const postalPath=tmdbConfig.images.base_url+tmdbConfig.images.backdrop_sizes[0]+movieDetail.poster_path;
-        const originalTitle=movieDetail.original_title;
-        const backDrop_path=tmdbConfig.images.base_url+tmdbConfig.images.backdrop_sizes[3]+movieDetail.backdrop_path;
-        
-        const genres=movieDetail.genres.map((genre,genreIndex)=>
-            <>
-                <span>{genre.name}</span>{genreIndex !== movieDetail.genres.length-1 && <>,</>}
-            </>
-        )
+    },[known_for_movie])
+
+    if(personDetail && tmdbConfig){
+        const {profile_path, known_for_department, gender, birthday, place_of_birth, also_known_as, name, biography}=personDetail;
+        const actorGender= gender ===1 ? 'Female': "Male";
+        const profilePath=imgBaseUrl+imgSize+profile_path;
+        const formattedBirthday = new Date(birthday).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         return(
-            <div 
-                className='relative w-full py-[30px] bg-purple-500 bg-opacity-50'
-                style={{
-                    backgroundImage: `url(${backDrop_path})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center 30%",
-                    backgroundBlendMode: "multiply",
-                }}
-            >
-                <div className="container mx-auto flex gap-3">
-                    <img className="rounded-md" src={postalPath} alt="" />
-                    <div className="flex flex-col gap-2">
-                        <div className="text-white">
-                            <span className="font-bold text-[25px]">{originalTitle}</span>
-                            <span className="text-[25px] ml-2">({year})</span>
+            <div>
+                <div className="container mx-auto flex gap-2">
+                    <div className="flex flex-col">
+                        <img className="w-[300px] h-[450px] object-cover" src={profilePath} alt="" />
+                        <span>Personal information</span>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex flex-col">
+                                <span className="font-bold">Known For</span>
+                                <span>{known_for_department}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="font-bold">Known Credits</span>
+                                <span>coming soon...</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="font-bold">Gender</span>
+                                <span>{actorGender}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="font-bold">Birthday</span>
+                                <span>{formattedBirthday}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="font-bold">Place of Birth</span>
+                                <span>{place_of_birth}</span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="font-bold">Also Known As</span>
+                                {also_known_as.map(other_name=> <span>{other_name}</span>)}
+                            </div>
+                           
                         </div>
-                        <div className="text-white">{genres}</div>
-                        <div className="text-white">
-                            <div className="p-1 w-[50px] h-[50px] flex items-center justify-center rounded-full bg-black text-white text-[20px] font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{vote_average}</div>
-                        </div>
-                        <div>
-                            <button className="bg-[#032541] p-2 rounded-full" onClick={()=>handleAddToFavorite()}><Heart fill="white"/></button>
-                        </div>
+
+                        
+
                     </div>
+                    <div className="flex flex-col flex-1">
+                        <h1 className="text-[25px]">{name}</h1>
+                        <div>
+                            <span className="font-bold">Biography</span>
+                            <p className="text-wrap" dangerouslySetInnerHTML={{ __html: biography.replace(/\n/g, "<br>") }} />
+                        </div>
+                        <div className="max-w-[900px]">
+                            <span className="font-bold">Known For</span>
+                            <KnownForBanner known_for_movies={known_for_movie?.cast} imgBaseUrl={imgBaseUrl} imgSize={imgSize}/>
+                        </div>
+                        <div className="max-w-[900px]">
+                            <span className="font-bold">Acting</span>
+                            <Acting/>
+                        </div>
+                    </div>  
                 </div>
             </div>
         )
