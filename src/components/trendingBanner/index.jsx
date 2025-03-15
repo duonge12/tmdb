@@ -23,12 +23,12 @@ export const TrendingBanner=()=>{
         }
     };
     const imgBaseUrl=tmdbConfig?.images.base_url;
-    const imgSize=tmdbConfig?.images.poster_sizes
+    const imgSize=tmdbConfig?.images.poster_sizes[1]
     const slides=tmdbTrendingMovie.map((movie) =>{
         const {release_date, vote_average, title, id, poster_path}=movie
         const formattedDate = new Date(release_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         const formatedVoteAverage=Math.round(vote_average*10);
-        const postalPath=imgBaseUrl+imgSize[1]+poster_path;
+        const postalPath=imgBaseUrl+imgSize+poster_path;
         return(
             <Link to={"/movie/"+id} className="rounded-md min-w-[150px] shadow-sm" key={id}>
                 <img className="object-cover w-full h-[225px]" src={postalPath} alt="Not found" />

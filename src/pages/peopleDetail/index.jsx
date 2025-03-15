@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router"
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 import { useEffect, useState } from "react";
-import { Heart } from "lucide-react";
 import { peopleApi } from "../../services/peopleApi";
 import { KnownForBanner } from "./knownForBanner";
 import { Acting } from "./acting";
@@ -12,18 +11,11 @@ export const PeopleDetail=()=>{
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
     const [ personDetail, setPersonDetail]=useState();
-    const [ known_for_movie, setKnown_for_movie]=useState()
 
     const handleFetchPeople=async()=>{
         const response=await peopleApi.getPeopleDetail(personId)
         if(response){
             setPersonDetail(response)
-        }
-    }
-    const handleFetchKnownForMovie=async()=>{
-        const response=await peopleApi.getCombinedCredit(personId)
-        if(response){
-            setKnown_for_movie(response)
         }
     }
     const imgBaseUrl=tmdbConfig?.images.base_url ?? '';
@@ -40,13 +32,6 @@ export const PeopleDetail=()=>{
             handleFetchPeople()
         }
     },[personDetail])
-
-    useEffect(()=>{
-        console.log(known_for_movie)
-        if(!known_for_movie){
-            handleFetchKnownForMovie()
-        }
-    },[known_for_movie])
 
     if(personDetail && tmdbConfig){
         const {profile_path, known_for_department, gender, birthday, place_of_birth, also_known_as, name, biography}=personDetail;
@@ -82,7 +67,7 @@ export const PeopleDetail=()=>{
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-bold">Also Known As</span>
-                                {also_known_as.map(other_name=> <span>{other_name}</span>)}
+                                {also_known_as.map((other_name, other_nameIndex)=> <span key={other_nameIndex}>{other_name}</span>)}
                             </div>
                            
                         </div>
@@ -98,11 +83,10 @@ export const PeopleDetail=()=>{
                         </div>
                         <div className="max-w-[900px]">
                             <span className="font-bold">Known For</span>
-                            <KnownForBanner known_for_movies={known_for_movie?.cast} imgBaseUrl={imgBaseUrl} imgSize={imgSize}/>
+                            <KnownForBanner personId={personId} imgBaseUrl={imgBaseUrl} imgSize={imgSize}/>
                         </div>
                         <div className="max-w-[900px]">
-                            <span className="font-bold">Acting</span>
-                            <Acting/>
+                            <Acting personId={personId}/>
                         </div>
                     </div>  
                 </div>

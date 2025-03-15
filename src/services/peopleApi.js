@@ -21,4 +21,24 @@ export const peopleApi={
             throw error;
         }
     },
+    getMovieCredits:async(peopleId)=>{
+        try{
+            const response= await instance.get(`/person/${peopleId}/movie_credits`);
+            if(response){
+                return response.data;
+            }
+        }catch(error){
+            throw error;
+        }
+    },
+    getTVCredits:async(peopleId)=>{
+        try{
+            const response= await instance.get(`/person/${peopleId}/tv_credits`);
+            if(response){
+                return response.data;
+            }
+        }catch(error){
+            throw error;
+        }
+    },
 }

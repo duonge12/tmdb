@@ -1,0 +1,29 @@
+ // const handleDivideByYear=()=>{
+    //     const cast= handleGetCast(productCategory)
+    //     const castYear=Array.from(new Set(cast.map(movie=> movie.release_year)))
+
+    //     const castByYear=castYear.map(year=>{
+    //         return{
+    //             year:year ===9999999 ? "?": year,
+    //             movie:cast.filter(movie=> movie.release_year === year)
+    //         }
+    //     }).sort((a, b) => b.year - a.year)
+    //     castByYear.unshift(castByYear[castByYear.length-1]);
+    //     castByYear.pop()
+
+
+    //     const crew= handleGetCrew(productCategory,"all")
+    //     const crewYear=Array.from(new Set(crew.map(movie=> movie.release_year)))
+
+    //     const crewByYear=crewYear.map(year=>{
+    //         return{
+    //             year:year ===9999999 ? "?": year,
+    //             movie:crew.filter(movie=> movie.release_year === year)
+    //         }
+    //     }).sort((a, b) => b.year - a.year)
+    //     crewByYear.unshift(crewByYear[crewByYear.length-1]);
+    //     crewByYear.pop()
+
+    //     console.log('castYear',castByYear)
+    //     console.log('crewYear',crewByYear)
+    // }
