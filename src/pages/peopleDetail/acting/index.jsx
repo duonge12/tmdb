@@ -8,15 +8,15 @@ const productCategoryOptions = [
   ];
   const departmentOptions = [
     { value: "all", text: "All" },
-    { value: "acting", text: "Acting"},
-    { value: "production", text: "Production" },
-    { value: "sound", text: "Sound"},
+    { value: "Acting", text: "Acting"},
+    { value: "Production", text: "Production" },
+    { value: "Sound", text: "Sound"},
   ];
 export const Acting=({personId})=>{
     const [movieCredits, setMovieCredits]=useState();
     const [tvCredits, setTvCredits]=useState();
-    const [ productCategory, setProductCategory]=useState(productCategoryOptions[0].value);
-    const [ department, setDepartment]=useState(departmentOptions[0].value)
+    const [ productCategory, setProductCategory]=useState(productCategoryOptions[1].value);
+    const [ department, setDepartment]=useState(departmentOptions[1].value)
 
     const handleFetchTvCredits=async()=>{
         const response=await peopleApi.getTVCredits(personId)
@@ -24,37 +24,38 @@ export const Acting=({personId})=>{
             setTvCredits(response)
         }
     }
+
     const handleFetchMovieCredits=async()=>{
         const response=await peopleApi.getMovieCredits(personId)
         if(response){
             setMovieCredits(response)
         }
     }
+
     const handleChangeProductCategory = (event) => {
         setProductCategory(event.target.value);  
     };
+
     const handleChangeDepartment = (event) => {
         setDepartment(event.target.value);  
     };
-    const handleGetCrew=(category, department)=>{
+
+    const handleFormatingData=(category, department)=>{
         const movieCastAdded=movieCredits?.cast.map(movie=>{ 
             movie.media_type='movie';
             movie.to='/movie/detail/'+movie.id;
-            movie.department='acting'
+            movie.department='Acting'
             movie.release_year=movie.release_date !==''? new Date(movie.release_date).getFullYear() : 9999;   
             return movie
         }) ?? []
         const tvCastAdded=tvCredits?.cast.map(tv=>{ 
             tv.media_type='tv';
             tv.to='/tv/detail/'+tv.id;
-            tv.department='acting'
+            tv.department='Acting'
             tv.release_year=tv.first_air_date !==''? new Date(tv.first_air_date).getFullYear() : 9999;   
             return tv
         }) ?? [];
-        let castData=movieCastAdded.concat(tvCastAdded);
-        if(category !== 'all'){
-            castData=castData.filter(movie=> movie.media_type === category)
-        }
+        const combinedCast=movieCastAdded.concat(tvCastAdded);
         const movieCrewAdded=movieCredits?.crew.map(movie=>{ 
             movie.media_type='movie';
             movie.to='/movie/detail/'+movie.id
@@ -68,59 +69,45 @@ export const Acting=({personId})=>{
             tv.release_year=tv.first_air_date !==''? new Date(tv.first_air_date).getFullYear() : 9999;   
             return tv
         }) ?? []
-        let crewData=movieCrewAdded.concat(tvCrewAdded);
+        const combinedCrew=movieCrewAdded.concat(tvCrewAdded);
+        let combinedCastAndCrew=combinedCrew.concat(combinedCast);
         if(category !== 'all'){
-            crewData=crewData.filter(movie=> movie.media_type === category)
+            combinedCastAndCrew=combinedCastAndCrew.filter(movie=> movie.media_type === category);
         }
         if(department !== 'all'){
-            crewData=crewData.filter(movie=> movie.department === department);
+            combinedCastAndCrew=combinedCastAndCrew.filter(movie=> movie.department === department);
         }
-        return crewData;
+        return combinedCastAndCrew
+
     }
 
+    const handleDivideByDepartMent=()=>{
+        const movies= handleFormatingData(productCategory,department)
+        const groupedData= Object.entries(
+            movies.reduce((acc, { department, ...rest }) => {
+                if (!acc[department]) {
+                    acc[department] = [];
+                }
+                acc[department].push(rest);
+                return acc;
+            }, {})
+        ).map(([department, movies]) => ({ department, movies }));
+        return groupedData;
+
+    }
+    
     const handleDivideByYear=(movies)=>{
         const movieYear=Array.from(new Set(movies.map(movie=> movie.release_year))).sort((a, b) => b - a);
-
         const movieDividedByYear=movieYear.map(year=>{
             return{
                 year:year,
-                movies:movies.filter(movie=> movie.release_year === year)
+                movies:movies.filter(movie=> movie.release_year === year),
+                
             }
         })
         return movieDividedByYear;
     }
-    const handleRenderRow=()=>{
-        if( department !== 'Acting'){ 
-            return (<>
-            <div className="text-[25px] font-bold">{department}</div>
-            <div className="flex flex-col gap-2">
-                {handleDivideByYear(handleGetCrew(productCategory,department)).map(item=>{
-                    const {year, movies}=item;
-                    return(
-                        <div className="flex gap-2 border-b-1">
-                            <div className="w-[50px] py-1">{year !== 9999 ? year : '?'}</div>
-                            <div className="flex flex-col gap-2 py-1">
-                                {movies.map(movie=>{
-                                    const {id, to, media_type, job}=movie;
-                                    return(
-                                        <div key={id+media_type}>
-                                            <Link to={to} className="font-bold text-[15px]"> {media_type ==='movie' ? movie.original_title : movie.original_name}</Link>
-                                            <div className="text-[10px]"><span className="text-gray-500">...</span> {job}</div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    )
-                }) }
-            </div>
-        </>)}
-        if(department ==='All'){
-            ['Acting', 'Production', 'Sound'].map(item=> 
-
-            )
-        }
-    }
+   
     useEffect(()=>{
         if(!movieCredits){
             handleFetchMovieCredits()
@@ -129,14 +116,6 @@ export const Acting=({personId})=>{
             handleFetchTvCredits()
         }
     },[personId])
-    useEffect(()=>{
-        // console.log('cast',handleGetCast(productCategory))
-        // console.log('crew',handleGetCrew(productCategory,"all"))
-        const cast= handleDivideByYear(handleGetCast(productCategory))
-        const crew= handleDivideByYear(handleGetCrew(productCategory,"all"))
-        // console.log("cast",cast);
-        // console.log("crew",crew)
-    })
     return(
         <div>
             <div className="flex">
@@ -156,7 +135,52 @@ export const Acting=({personId})=>{
                 </select>
             </div>
             <div>
-              
+           {
+            handleDivideByDepartMent().map((departmentItem,departmentItemIndex)=>{
+                const {department,movies}=departmentItem;
+                const moviesDividedByYear=handleDivideByYear(movies)
+                return(
+                    <div key={departmentItemIndex}>
+                        <h1 className="text-[20px] font-bold">{department}</h1>
+                        <div className="border border-[#e5e5e5]">
+                            {moviesDividedByYear.map((movieDividedByYear, movieDividedByYearIndex)=>{
+                                const {movies, year}=movieDividedByYear
+                                return(
+                                    <div key={movieDividedByYearIndex} className="border-b border-[#e5e5e5] flex">
+                                        <h1 className="text-[16px] font-bold w-[80px]">{year !== 9999 ? year : "?"}</h1>
+                                        <div>
+                                        {movies.map(movie=>{
+                                            const {credit_id, media_type, to, character}=movie
+                                            const title=media_type === 'movie' ? movie.original_title : movie.original_name
+                                            const participatedAs=media_type === 'tv' ? `(${movie.episode_count} episode) `: '';
+                                            const departmentRole=movie.job
+                                            return(
+                                                <Link to={to} key={credit_id}>
+                                                    <h2 className="text-[16px] font-bold">{title}</h2>
+                                                    {department === 'Acting' ?  
+                                                        <div className="text-[14px] pl-3">
+                                                            {participatedAs}
+                                                            <span className="text-gray-500">as </span> 
+                                                            {character}
+                                                        </div>
+                                                        :
+                                                        <div className="text-[14px] pl-3">
+                                                            <span className="text-gray-500">as </span> 
+                                                            {departmentRole}
+                                                        </div>
+                                                    }
+                                                </Link>
+                                            )
+                                        })}
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                )
+            })
+           }
                 
             </div>
         </div>
