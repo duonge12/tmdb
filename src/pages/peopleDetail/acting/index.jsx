@@ -15,8 +15,8 @@ const productCategoryOptions = [
 export const Acting=({personId})=>{
     const [movieCredits, setMovieCredits]=useState();
     const [tvCredits, setTvCredits]=useState();
-    const [ productCategory, setProductCategory]=useState(productCategoryOptions[1].value);
-    const [ department, setDepartment]=useState(departmentOptions[1].value)
+    const [ productCategory, setProductCategory]=useState(productCategoryOptions[0].value);
+    const [ department, setDepartment]=useState(departmentOptions[0].value)
 
     const handleFetchTvCredits=async()=>{
         const response=await peopleApi.getTVCredits(personId)
