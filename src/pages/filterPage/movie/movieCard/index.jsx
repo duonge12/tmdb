@@ -1,9 +1,24 @@
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
+import { fetchTmdbConfig } from "../../../../redux/tmdbConfigReducer";
+import { useEffect } from "react";
 
-export const MovieCard=({movie, imgBaseUrl, imgSizes})=>{
-    const {release_date,vote_average, title, id, poster_path }=movie
+export const MovieCard=({movie})=>{
+    const dispatch = useDispatch();
+    const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
+    
+    useEffect(()=>{
+        if(!tmdbConfig){
+            dispatch(fetchTmdbConfig())
+        }
+    },[tmdbConfig])
+    
+    if(tmdbConfig){
+        const {release_date,vote_average, title, id, poster_path }=movie
         const formattedDate = new Date(release_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
         const formattedVoteAverage=Math.round(vote_average*10);
+        const imgBaseUrl=tmdbConfig?.images.base_url;
+        const imgSizes=tmdbConfig?.images.poster_sizes;
         const postalPath=imgBaseUrl+imgSizes[2]+poster_path;
         return(
             <Link to={`/movie/detail/${id}`} className="rounded-md shadow-sm overflow-hidden" key={id}>
@@ -15,4 +30,5 @@ export const MovieCard=({movie, imgBaseUrl, imgSizes})=>{
                 </div>
             </Link>
         )
+    }
 }

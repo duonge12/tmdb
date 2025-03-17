@@ -11,23 +11,19 @@ const menuItems=[
         child:[
             {
                 title:"Popular",
-                to:"/movie"
+                to:"/filterPage/movie"
             },
             {
                 title:"Now playing",
-                to:"/movie/now-playing"
+                to:"/filterPage/movie/now-playing"
             },
             {
                 title:"Up coming",
-                to:"/movie/upcoming"
+                to:"/filterPage/movie/upcoming"
             },
             {
                 title:"Top rated",
-                to:"/movie/top-rated"
-            },
-            {
-                title:"Testing",
-                to:"/test"
+                to:"/filterPage/movie/top-rated"
             }
         ]
     },
@@ -36,19 +32,19 @@ const menuItems=[
         child:[
             {
                 title:"Popular",
-                to:"/tv"
+                to:"/filterPage/tv"
             },
             {
                 title:"Airing Today",
-                to:"/tv/now-playing"
+                to:"/filterPage/tv/now-playing"
             },
             {
                 title:"On TV",
-                to:"/tv/upcoming"
+                to:"/filterPage/tv/upcoming"
             },
             {
                 title:"Top rated",
-                to:"/tv/top-rated"
+                to:"/filterPage/tv/top-rated"
             }
         ]
     },

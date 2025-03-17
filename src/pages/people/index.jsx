@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
 import { fetchTmdbPopularPeopleList } from "../../redux/tmdbPopularPeopleReducer";
-import { Link } from "react-router";
 import { PeopleCard } from "./peopleCard";
 
 
