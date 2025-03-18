@@ -11,9 +11,6 @@ export const DetailTVBanner=({
 })=>{
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
-    const {original_name,vote_average, first_air_date, poster_path, backdrop_path}=tvDetail
-    const year=new Date(first_air_date).getFullYear();
-    const formatedVoteAverage=Math.round(vote_average*10);
 
     const handleAddToFavorite=async()=>{
         const body={
@@ -35,6 +32,9 @@ export const DetailTVBanner=({
     },[tmdbConfig])
 
     if(tmdbConfig){
+        const {original_name,vote_average, first_air_date, poster_path, backdrop_path, tagline}=tvDetail
+        const year=new Date(first_air_date).getFullYear();
+        const formatedVoteAverage=Math.round(vote_average*10);
         const imgBaseUrl=tmdbConfig?.images.base_url ?? '';
         const imgSize=tmdbConfig?.images.backdrop_sizes ?? '';
         const postalPath=imgBaseUrl+imgSize[0]+poster_path;
@@ -68,6 +68,9 @@ export const DetailTVBanner=({
                         </div>
                         <div>
                             <button className="bg-[#032541] p-2 rounded-full"><Heart onClick={handleAddToFavorite} fill="white"/></button>
+                        </div>
+                        <div>
+                            {tagline}
                         </div>
                     </div>
                 </div>

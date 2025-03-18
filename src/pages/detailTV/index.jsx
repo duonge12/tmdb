@@ -7,6 +7,7 @@ import { DetailTVBanner } from "./banner";
 import { SeriesCast } from "./seriesCast";
 import { Recommendation } from "./recommendation";
 import { SideInformation } from "./sideInformation";
+import { Social } from "./social";
 
 export const DetailTV=()=>{
     const {tvId}= useParams();
@@ -47,6 +48,7 @@ export const DetailTV=()=>{
                 <div className="flex w-full container mx-auto">
                     <div>
                         <SeriesCast tvID={tvId}/>
+                        <Social/>
                         <Recommendation tvId={tvId}/>
                     </div>
                     <div>

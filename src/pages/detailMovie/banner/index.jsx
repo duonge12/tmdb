@@ -2,8 +2,9 @@ import { Heart } from "lucide-react";
 import { accountApi } from "../../../services/accountApi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTmdbConfig } from "../../../redux/tmdbConfigReducer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchFavoriteListInfo } from "../../../redux/tmdbAccountFavoriteMovieReducer";
+import { moviesApi } from "../../../services/moviesApi";
 
 export const DetailMovieBanner=({
     accountId,
@@ -12,7 +13,13 @@ export const DetailMovieBanner=({
 })=>{
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
-
+    const [crews, setCrews]=useState()
+    const handleFetchCrew=async()=>{
+        const response=await moviesApi.getMovieCredits(movieId)
+        if(response){
+            setCrews(response.crew)
+        }
+    }
     const handleAddToFavorite=async()=>{
         const body={
             "media_type": "movie",
@@ -25,17 +32,42 @@ export const DetailMovieBanner=({
             dispatch(fetchFavoriteListInfo(accountId,params))
         }
     }
+    const handleFilterDirector=()=>{
+        if(crews){
+            const directorId=crews.filter(crew=>crew.department ==="Directing").map(crew=> crew.id)
+            const directorList= directorId.map(id=>{
+                const director=crews.reduce((acc, curr)=>{
+                    if(curr.id === id){
+                        acc.name=curr.name
+                        acc.jobs.push(curr.job);
+                    }
+                    return acc;
+                },{ id:id, jobs:[]});
+                return director
+            })
+            return directorList
+        }
+        return []
+    }
 
     useEffect(()=>{
         if(!tmdbConfig){
             dispatch(fetchTmdbConfig())
         }
     },[tmdbConfig])
+    useEffect(()=>{
+        if(!crews){
+            handleFetchCrew()
+        }
+    },[crews])
+    useEffect(()=>{
+        handleFetchCrew()
+    },[movieId])
 
     if(tmdbConfig){
         const imgBaseUrl=tmdbConfig?.images.base_url ?? '';
         const imgSize=tmdbConfig?.images.backdrop_sizes ?? '';
-        const {original_title,vote_average, release_date, poster_path, backdrop_path, genres}=movieDetail
+        const {original_title,vote_average, release_date, poster_path, backdrop_path, genres, tagline, overview}=movieDetail
         const year=new Date(release_date).getFullYear();
         const formatedVoteAverage=Math.round(vote_average*10);
         const postalPath=imgBaseUrl+imgSize[0]+poster_path;
@@ -69,6 +101,26 @@ export const DetailMovieBanner=({
                         </div>
                         <div>
                             <button className="bg-[#032541] p-2 rounded-full" onClick={()=>handleAddToFavorite()}><Heart fill="white"/></button>
+                        </div>
+                        <div className="text-gray-500">
+                           {tagline}
+                        </div>
+                        <div className="text-white">
+                            <div className="font-bold">Overview</div>
+                            <div>{overview}</div>
+                        </div>
+                        <div className="flex text-white gap-5 flex-wrap">
+                            {handleFilterDirector().length !==0 && handleFilterDirector().map(director=>{
+                                const {name, id, jobs}=director
+                                return(
+                                    <div key={id}>
+                                        <div className="font-bold">{name}</div>
+                                        <div className="whitespace-nowrap">
+                                            {jobs.join(', ')}
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
                     </div>
                 </div>    

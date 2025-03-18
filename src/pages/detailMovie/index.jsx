@@ -7,6 +7,7 @@ import { DetailMovieBanner } from "./banner";
 import { TopBillCast } from "./topBillCast";
 import { SideInformation } from "./sideInfromation";
 import { Recommendation } from "./recommendation";
+import { Social } from "./social";
 
 export const DetailMovie=()=>{
     const {movieId}= useParams();
@@ -52,6 +53,7 @@ export const DetailMovie=()=>{
                     <div className="container mx-auto flex">
                         <div>
                             <TopBillCast movieID={movieId}/>
+                            <Social/>
                             <Recommendation movieID={movieId}/>
                         </div>
                         <div>

@@ -4,7 +4,7 @@ import { handleTitle } from "../../utils/handleUrl";
 
 export const FilterPage=()=>{
     const {pathname}=useLocation();
-    const title=handleTitle(pathname)
+    const title=handleTitle(pathname);
     return(
          <div>
             <div className="container mx-auto">
