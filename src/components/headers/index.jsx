@@ -87,12 +87,48 @@ const accountMenuItems = [
     { title: "Edit Profile", to: "/account/edit" },
     { title: "Settings", to: "/account/settings" }
 ];
+const UserDropDown=({visible,handleToggle,user})=>{
+    const dispatch = useDispatch();
+    const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
+    useEffect(()=>{
+        if(!tmdbConfig){
+            dispatch(fetchTmdbConfig())
+        }
+    },[tmdbConfig])
 
+    if(tmdbConfig && user){
+        const avatarPath=tmdbConfig.images.base_url+tmdbConfig.images.profile_sizes[2]+user.avatar.tmdb.avatar_path;
+        const {username}=user
+        return(
+            <>
+                <img src={avatarPath} onClick={()=>handleToggle(username)} alt="none" className="rounded-full object-cover w-[30px] h-[30px]" />
+                {
+                    (visible === username) && 
+                    <div className="absolute z-20 bg-white rounded-md flex flex-col">
+                        { <Link className="py-2 pl-4 pr-12 border-b-[1px]" to={"/account/accountDetail"}>
+                            <h1 className="font-bold">{username}</h1>
+                            <div className="whitespace-nowrap">View Profile</div>
+                        </Link>}
+                        <ul>
+                            {accountMenuItems.map((accountMenuItem, accountMenuItemIndex)=>{
+                            const {title, to}=accountMenuItem
+                            return(
+                                <li key={accountMenuItemIndex} className="py-2 pl-4 pr-12">
+                                <Link to={to}>{title}</Link>
+                                </li>
+                            )
+                        })}
+                        </ul>
+                    </div>
+                }
+            </>
+        )
+    }
+}
 
 export const Header=()=>{
     const [visible, setVisible]=useState();
     const dispatch = useDispatch();
-    const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
     const { tmdbAccount} = useSelector((state) => state.tmdbAccount);
     const handleToggleMenu=(currenVisible)=>{
         if(visible === currenVisible){
@@ -101,14 +137,9 @@ export const Header=()=>{
         }
         setVisible(currenVisible)
     }
-    const avatarBaseURL=tmdbConfig?.images.base_url;
-    const avatarSize=tmdbConfig?.images.profile_sizes[0]
-    const accountAvatar=avatarBaseURL+avatarSize+ tmdbAccount?.avatar.tmdb.avatar_path
-    const accountName=tmdbAccount?.username ?? '?'
 
     const menuItemUI=menuItems.map((menuItem, menuItemIndex)=>{
-        const category=menuItem.title;
-        const subCategories=menuItem.child
+        const {title: category, child: subCategories}=menuItem
         return(
             <div
                 key={menuItemIndex}
@@ -133,28 +164,8 @@ export const Header=()=>{
             </div>
         )
     })
-    const accountDropDown=accountMenuItems.map((accountMenuItem, accountMenuItemIndex)=>{
-        const {title, to}=accountMenuItem
-        return(
-            <li key={accountMenuItemIndex} className="py-2 pl-4 pr-12">
-            <Link to={to}>{title}</Link>
-            </li>
-        )
-    })
-    const accountMenuHeader=tmdbAccount && 
-        <Link className="py-2 pl-4 pr-12 border-b-[1px]" to={"/account/accountDetail"}>
-            <h1 className="font-bold">{accountName}</h1>
-            <div className="whitespace-nowrap">View Profile</div>
-        </Link>
     useEffect(()=>{
-        if(!tmdbConfig){
-            dispatch(fetchTmdbConfig())
-        }
-    },[tmdbConfig])
-    useEffect(()=>{
-        if(!tmdbAccount){
-            dispatch(fetchAccountInfo())
-        }
+        console.log(tmdbAccount)
     },[tmdbAccount])
     return(
         <div className="bg-[#032541]">
@@ -166,15 +177,10 @@ export const Header=()=>{
                     <div className="flex text-white">{menuItemUI}</div>
                 </div>
                 <div className="relative">
-                    <img src={accountAvatar} alt="none" className="rounded-full object-cover w-[30px] h-[30px]" onClick={()=>handleToggleMenu(accountAvatar)}/>
-                    {
-                        visible === accountAvatar && 
-                        <div className="absolute z-20 bg-white rounded-md flex flex-col">
-                            {accountMenuHeader}
-                            <ul>
-                                {accountDropDown}
-                            </ul>
-                        </div>
+                    {tmdbAccount ? 
+                        <UserDropDown visible={visible} handleToggle={handleToggleMenu} user={tmdbAccount} /> 
+                        : 
+                        <Link to={'/login'} className="text-white text-[20px]">Login</Link>
                     }
                 </div>
             </div>

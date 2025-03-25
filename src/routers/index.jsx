@@ -9,6 +9,7 @@ import { DetailMovie } from "../pages/detailMovie";
 import { DetailTV } from "../pages/detailTV";
 import { PeopleDetail } from "../pages/peopleDetail";
 import { AccountDetail } from "../pages/accountDetail";
+import { Login } from "../pages/login";
 
 export const router=createBrowserRouter([
     { path:'/', element:<App/>,
@@ -25,6 +26,7 @@ export const router=createBrowserRouter([
                 ]},
             ]},
             { path:'/person', element:<People/>},
+            { path:'/login', element:<Login/>},
             { path:'/movie/detail/:movieId', element:<DetailMovie/>},
             { path:'/tv/detail/:tvId', element:<DetailTV/>},
             { path:'/person/:personId', element:<PeopleDetail/>},

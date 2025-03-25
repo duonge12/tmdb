@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { accountApi } from "../services/accountApi";
+import { firebaseApi } from "../firebase/firebaseInstance";
 
 
 
-export const fetchAccountInfo = createAsyncThunk('account/fetchAccountInfo',async()=>{
-    const response=await accountApi.getAccountInfo();
-    return response.data;
+export const fetchAccountInfo = createAsyncThunk('account/fetchAccountInfo',async(id)=>{
+    const response=await firebaseApi.getClients(id)
+    return response;
 })
 const initialState={
     tmdbAccount:undefined,
@@ -20,12 +20,15 @@ const tmdbAccountSlice=createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchAccountInfo.pending, (state) => {
-            state.loading_tmdbAccount = true;
-            state.tmdbAccount_error = null;
+                state.loading_tmdbAccount = true;
+                state.tmdbAccount_error = null;
             })
             .addCase(fetchAccountInfo.fulfilled, (state, action) => {
-            state.loading_tmdbAccount = false;
-            state.tmdbAccount = action.payload;
+                const clientSnapShot=action.payload
+                if(clientSnapShot.exists()){
+                    state.loading_tmdbAccount = false;
+                    state.tmdbAccount = clientSnapShot.val();
+                }
             })
             .addCase(fetchAccountInfo.rejected, (state, action) => {
             state.loading_tmdbAccount = false;

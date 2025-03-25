@@ -20,18 +20,6 @@ export const LastestTrailerBanner=()=>{
           scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
         }
     };
-    const imgBaseUrl=tmdbConfig?.images.base_url;
-    const imgSize=tmdbConfig?.images.poster_sizes;
-
-    const slides=tmdbPopular?.map((movie) =>{
-        const {id, poster_path}=movie;
-        const postalPath=imgBaseUrl+imgSize[1]+poster_path;
-        return(
-            <div to={"/movie/"+id} className="rounded-md min-w-[150px] shadow-sm" key={id}>
-                <img className="object-cover w-full h-[225px]" src={postalPath} alt="Not found" />
-            </div>
-        )
-    })
     useEffect(()=>{
         if(tmdbPopular.length ===0){
             const params={
@@ -46,22 +34,34 @@ export const LastestTrailerBanner=()=>{
             dispatch(fetchTmdbConfig())
         }
     },[tmdbConfig])
-    return(
-        <div className="w-full">
-            <div className="container mx-auto">
-                <div className="flex gap-3">
-                    <h1>Lastest trailer</h1>
-                </div>
-                <div className="relative w-full">
-                    <div
-                        ref={scrollRef}
-                        {...handlers}
-                        className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2"
-                    >
-                       {slides}
+    if(tmdbConfig){
+        const imgBaseUrl=tmdbConfig?.images.base_url;
+        const imgSize=tmdbConfig?.images.poster_sizes;
+        return(
+            <div className="w-full">
+                <div className="container mx-auto">
+                    <div className="flex gap-3">
+                        <h1>Lastest trailer</h1>
+                    </div>
+                    <div className="relative w-full">
+                        <div
+                            ref={scrollRef}
+                            {...handlers}
+                            className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2"
+                        >
+                           {tmdbPopular?.map((movie) =>{
+                                const {id, poster_path}=movie;
+                                const postalPath=imgBaseUrl+imgSize[1]+poster_path;
+                                return(
+                                    <div to={"/movie/"+id} className="rounded-md min-w-[150px] shadow-sm" key={id}>
+                                        <img className="object-cover w-full h-[225px]" src={postalPath} alt="Not found" />
+                                    </div>
+                                )
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
 }

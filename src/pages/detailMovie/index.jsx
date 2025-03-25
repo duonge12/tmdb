@@ -53,7 +53,7 @@ export const DetailMovie=()=>{
                     <div className="container mx-auto flex">
                         <div>
                             <TopBillCast movieID={movieId}/>
-                            <Social/>
+                            <Social movieId={movieId}/>
                             <Recommendation movieID={movieId}/>
                         </div>
                         <div>
