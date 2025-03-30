@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { accountApi } from "../services/accountApi";
-
 export const fetchFavoriteListInfo = createAsyncThunk('tmdbFavoriteList/fetchFavoriteListInfo',async(accountId, params)=>{
-    const response=await accountApi.getFavoriteMovies(accountId,params)
+    const session_id=localStorage.getItem('session_id')
+    const response=await accountApi.getFavoriteMovies(accountId,{...params, session_id: session_id})
     return response.data;
 })
 const initialState={
@@ -26,6 +26,7 @@ const tmdbFavoriteListSlice=createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchFavoriteListInfo.pending, (state) => {
+                debugger
                 state.loading_tmdbFavoriteList = true;
                 state.tmdbFavoriteList_error = null;
             })

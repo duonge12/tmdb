@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
 import { fetchTmdbConfig } from "../../redux/tmdbConfigReducer";
-import { fetchAccountInfo } from "../../redux/tmdbAccountReducer";
+import { logOut } from "../../redux/tmdbAccountReducer";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase/firebaseConfig";
 
 const imgSrc="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg";
 const menuItems=[
@@ -78,18 +80,21 @@ const menuItems=[
             }
         ]
     }
-]
-const accountMenuItems = [
-    { title: "Discussions", to: "/account/discussions" },
-    { title: "Lists", to: "/account/lists" },
-    { title: "Ratings", to: "/account/ratings" },
-    { title: "Watchlist", to: "/account/watchlist" },
-    { title: "Edit Profile", to: "/account/edit" },
-    { title: "Settings", to: "/account/settings" }
 ];
 const UserDropDown=({visible,handleToggle,user})=>{
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
+
+    const handleLogout=async() => {
+        try {
+          await signOut(auth); 
+          localStorage.removeItem('session_id')
+          dispatch(logOut())
+        } catch (error) {
+          console.error("Logout failed:", error.message);
+        }
+    };
+
     useEffect(()=>{
         if(!tmdbConfig){
             dispatch(fetchTmdbConfig())
@@ -110,14 +115,27 @@ const UserDropDown=({visible,handleToggle,user})=>{
                             <div className="whitespace-nowrap">View Profile</div>
                         </Link>}
                         <ul>
-                            {accountMenuItems.map((accountMenuItem, accountMenuItemIndex)=>{
-                            const {title, to}=accountMenuItem
-                            return(
-                                <li key={accountMenuItemIndex} className="py-2 pl-4 pr-12">
-                                <Link to={to}>{title}</Link>
-                                </li>
-                            )
-                        })}
+                            <li className="py-2 pl-4 pr-12">
+                                <Link to='/account/discussions'>Discussions</Link>
+                            </li>
+                            <li className="py-2 pl-4 pr-12">
+                                <Link to='/account/lists'>Lists</Link>
+                            </li>
+                            <li className="py-2 pl-4 pr-12">
+                                <Link to='/account/ratings'>Ratings</Link>
+                            </li>
+                            <li className="py-2 pl-4 pr-12">
+                                <Link to='/account/watchlist'>Watchlist</Link>
+                            </li>
+                            <li className="py-2 pl-4 pr-12">
+                                <Link to='/account/edit'>Edit Profile</Link>
+                            </li>
+                            <li className="py-2 pl-4 pr-12">
+                                <Link to='/account/settings'>Settings</Link>
+                            </li>
+                            <li className="py-2 pl-4 pr-12">
+                                <button onClick={handleLogout}>Log out</button>
+                            </li>
                         </ul>
                     </div>
                 }
@@ -128,8 +146,8 @@ const UserDropDown=({visible,handleToggle,user})=>{
 
 export const Header=()=>{
     const [visible, setVisible]=useState();
-    const dispatch = useDispatch();
     const { tmdbAccount} = useSelector((state) => state.tmdbAccount);
+    
     const handleToggleMenu=(currenVisible)=>{
         if(visible === currenVisible){
             setVisible(undefined);
@@ -138,35 +156,6 @@ export const Header=()=>{
         setVisible(currenVisible)
     }
 
-    const menuItemUI=menuItems.map((menuItem, menuItemIndex)=>{
-        const {title: category, child: subCategories}=menuItem
-        return(
-            <div
-                key={menuItemIndex}
-                className="py-3 px-2 relative"
-                onClick={()=>handleToggleMenu(category)}
-            >
-                <span className="select-none">{category}</span>
-                { (visible === category) && 
-                    <ul className="absolute z-20 bg-white text-black pl-4 pr-12 whitespace-nowrap rounded-md">
-                        {subCategories.map((item, index)=>{
-                            const subCategory=item.title;
-                            const routerPath=item.to;
-                            return(
-                                <li key={index} className="py-2">
-                                    <Link to={routerPath}>{subCategory}</Link>
-                                </li>
-                            )
-                        }
-                        )}
-                    </ul>
-                }
-            </div>
-        )
-    })
-    useEffect(()=>{
-        console.log(tmdbAccount)
-    },[tmdbAccount])
     return(
         <div className="bg-[#032541]">
             <div className="container mx-auto flex justify-between items-center">
@@ -174,7 +163,34 @@ export const Header=()=>{
                     <Link to="/">
                         <img className="w-[154px] h-[20px]" src={imgSrc} alt="tmdb"/>
                     </Link>
-                    <div className="flex text-white">{menuItemUI}</div>
+                    <div className="flex text-white">
+                        {menuItems.map((menuItem, menuItemIndex)=>{
+                            const {title: category, child: subCategories}=menuItem
+                            return(
+                                <div
+                                    key={menuItemIndex}
+                                    className="py-3 px-2 relative"
+                                    onClick={()=>handleToggleMenu(category)}
+                                >
+                                    <span className="select-none">{category}</span>
+                                    { (visible === category) && 
+                                        <ul className="absolute z-20 bg-white text-black pl-4 pr-12 whitespace-nowrap rounded-md">
+                                            {subCategories.map((item, index)=>{
+                                                const subCategory=item.title;
+                                                const routerPath=item.to;
+                                                return(
+                                                    <li key={index} className="py-2">
+                                                        <Link to={routerPath}>{subCategory}</Link>
+                                                    </li>
+                                                )
+                                            }
+                                            )}
+                                        </ul>
+                                    }
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
                 <div className="relative">
                     {tmdbAccount ? 

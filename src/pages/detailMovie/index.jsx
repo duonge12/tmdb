@@ -34,19 +34,14 @@ export const DetailMovie=()=>{
        
     },[movieId])
     
-    useEffect(()=>{
-        if(!tmdbAccount){
-            dispatch(fetchAccountInfo())
-        }
-    },[tmdbAccount])
 
     
-    if(movieDetail && tmdbAccount){
+    if(movieDetail){
         return(
             <div>
                 <DetailMovieBanner 
                     movieId={movieId}
-                    accountId={tmdbAccount.id}
+        
                     movieDetail={movieDetail}
                 />
                 <div className="w-full">

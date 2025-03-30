@@ -7,12 +7,12 @@ import { fetchFavoriteListInfo } from "../../../redux/tmdbAccountFavoriteMovieRe
 import { moviesApi } from "../../../services/moviesApi";
 
 export const DetailMovieBanner=({
-    accountId,
     movieId,
     movieDetail
 })=>{
     const dispatch = useDispatch();
     const { tmdbConfig} = useSelector((state) => state.tmdbConfig);
+    const { tmdbAccount} = useSelector((state) => state.tmdbAccount);
     const [crews, setCrews]=useState()
     const handleFetchCrew=async()=>{
         const response=await moviesApi.getMovieCredits(movieId)
@@ -21,15 +21,16 @@ export const DetailMovieBanner=({
         }
     }
     const handleAddToFavorite=async()=>{
+        const {id}=tmdbAccount
         const body={
             "media_type": "movie",
             "media_id": movieId, 
             "favorite": true
         }
-        const response=await accountApi.postToFavorite(accountId,body)
+        const response=await accountApi.postToFavorite(id,body)
         if(response.success){
             const params={ page:1, with_genres:'' }
-            dispatch(fetchFavoriteListInfo(accountId,params))
+            dispatch(fetchFavoriteListInfo(id,params))
         }
     }
     const handleFilterDirector=()=>{
@@ -74,8 +75,9 @@ export const DetailMovieBanner=({
         const backDrop_path=imgBaseUrl+imgSize[3]+backdrop_path;
         return(
             <div 
-                className='relative w-full py-[30px] bg-purple-500 bg-opacity-50'
+                className='relative w-full py-[30px] bg-opacity-50'
                 style={{
+                    background:'oklch(0.627 0.265 303.9)',
                     backgroundImage: `url(${backDrop_path})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center 30%",
@@ -100,7 +102,11 @@ export const DetailMovieBanner=({
                             <div className="p-1 w-[50px] h-[50px] flex items-center justify-center rounded-full bg-black text-white text-[20px] font-bold top-[-20%] left-[5%] border-2 border-yellow-300">{formatedVoteAverage}</div>
                         </div>
                         <div>
-                            <button className="bg-[#032541] p-2 rounded-full" onClick={()=>handleAddToFavorite()}><Heart fill="white"/></button>
+                            {tmdbAccount ? 
+                                <button className="bg-[#032541] p-2 rounded-full" onClick={()=>handleAddToFavorite()}><Heart fill="white"/></button>
+                                :
+                                <div className="bg-[#032541] p-2 rounded-full w-fit" title="need to login"><Heart fill="white"/></div>
+                            }
                         </div>
                         <div className="text-gray-500">
                            {tagline}

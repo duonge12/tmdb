@@ -16,7 +16,13 @@ const initialState={
 const tmdbAccountSlice=createSlice({
     name:"tmdbAccount",
     initialState:initialState,
-    reducers:{},
+    reducers:{
+        logOut:(state)=>{
+            state.tmdbAccount=undefined;
+            state.loading_tmdbAccount=false;
+            state.tmdbAccount_error=''
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchAccountInfo.pending, (state) => {
@@ -28,6 +34,7 @@ const tmdbAccountSlice=createSlice({
                 if(clientSnapShot.exists()){
                     state.loading_tmdbAccount = false;
                     state.tmdbAccount = clientSnapShot.val();
+                    localStorage.setItem('session_id',clientSnapShot.val().session_id)
                 }
             })
             .addCase(fetchAccountInfo.rejected, (state, action) => {
@@ -37,4 +44,5 @@ const tmdbAccountSlice=createSlice({
     },
 })
 const tmdbAccountReducer=tmdbAccountSlice.reducer
-export {tmdbAccountReducer}
+const {logOut}=tmdbAccountSlice.actions
+export {tmdbAccountReducer,logOut}

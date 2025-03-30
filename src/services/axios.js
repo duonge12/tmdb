@@ -1,6 +1,5 @@
 import axios from "axios";
-const api_key=import.meta.env.VITE_API_KEY
-const session_id=import.meta.env.VITE_SESSION_ID
+const api_key=import.meta.env.VITE_API_KEY;
 const instance = axios.create({
   baseURL: "https://api.themoviedb.org/3"
 });
@@ -21,8 +20,7 @@ const instanceAccount = axios.create({
 instanceAccount.interceptors.request.use(
   (config)=>{
     config.params={...config.params,
-      api_key:api_key,
-      session_id:session_id
+      api_key:api_key
     }
     return config
   },

@@ -12,7 +12,8 @@ export const accountApi={
     },
     postToFavorite:async(accountId,body)=>{
         try{
-            const response=await instanceAccount.post('/'+accountId+'/favorite',body);
+            const params={session_id: localStorage.getItem('session_id')}
+            const response=await instanceAccount.post('/'+accountId+'/favorite',body,{params:params});
             if(response){
                 return response.data
             }
